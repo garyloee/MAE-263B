@@ -99,7 +99,7 @@ Robot_263B = SerialLink(L, 'name', 'Robot');
 
 Robot_263B.model3d = 'UNIMATE/puma560';
 
-Robot_263B.plot([0,0,0,0,0,0],'workspace', [-1000 1000 -1000 1000 0 1000])
+Robot_263B.plot([0,0,pi/2,0,0,0],'workspace', [-1000 1000 -1000 1000 0 1000])
 Robot_263B
 %
 % some useful poses
