@@ -70,28 +70,19 @@
 %
 % http://www.petercorke.com
 
-%The links are defined below, you can comment or un comment the modified or standard to select which method you want to use
+%% Initialization
 
 close all
 clear L
 deg = pi/180;
 
-%This set uses standard and it is currently working in the code (Selected)
-L(1) = Link([0,400,0,0,0])
-L(2) = Link([0,0,325,0,0])
-L(3) = Link([0,0,225,0,0])
-L(4) = Link([0, 0, 0,-pi,0])
-L(5) = Link([0, 0, 0,pi,1])
-L(6) = Link([0, -170, 0,0,0])
-
-%This set uses modified as is currently not working in the code since it is commented
-
-% L(1) = Link([0, 0, 0,0,0],'modified')
-% L(2) = Link([0, 0, 0,pi/2,0],'modified')
-% L(3) = Link([0, 0.15005, 0.4318,0,0],'modified')
-% L(4) = Link([0, 0.4318, 0.0203,-pi/2,0],'modified')
-% L(5) = Link([0, 0, 0,pi/2,0],'modified')
-% L(6) = Link([0, 0, 0,-pi/2,0],'modified')
+%% Defining robot arm configuration
+L(1) = Link([0,400,0,0,0]);
+L(2) = Link([0,0,325,0,0]);
+L(3) = Link([0,0,225,0,0]);
+L(4) = Link([0, 0, 0,-pi,0]);
+L(5) = Link([0, 0, 0,pi,1]);
+L(6) = Link([0, -170, 0,0,0]);
 
 Robot_263B = SerialLink(L, 'name', 'Robot');
 
@@ -99,15 +90,50 @@ Robot_263B = SerialLink(L, 'name', 'Robot');
 
 Robot_263B.model3d = 'UNIMATE/puma560';
 
-Robot_263B.plot([0,0,pi/2,0,0,0],'workspace', [-1000 1000 -1000 1000 0 1000])
+% base pose: 90 degrees elbow at the middle of the PCB
+Robot_263B.plot([0,0,pi/2,-pi/2,0,0],'workspace', [-1000 1000 -1000 1000 0 1000])
 Robot_263B
-%
-% some useful poses
-%
-% qz = [0 0 0 0 0 0]; % zero angles, L shaped pose
-% qr = [0 pi/2 -pi/2 0 0 0]; % ready pose, arm up
-% qs = [0 0 -pi/2 0 0 0];
-% qn=[0 pi/4 pi 0 pi/4  0];
+
+%% implementing IK
+% input require coordinates
+% IK function output joint angles
+
+
+% input transformation matrix and get the thetas and ds
+function [t1, t2, t3, d4]=IKrobot(TMatrix)
+t = num2cell(TMatrix');
+[   r11, r12, r13, px,...
+    r21, r22, r23, py,...
+    r31, r32, r33, pz,...
+    ~,   ~,   ~,   ~,   ] = deal(t{:});
+COSt2=(px^2+py^2-225^2-325^2)/(2*225*325);
+t2=atan2(sqrt(1-COSt2^2),COSt2);
+t1=atan2(py,px)-atan2(225*sin(t2),325+225*cos(t2));
+t3=atan2(r21,r11)-t2-t1;
+d4=230-pz;
+
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 clear L
